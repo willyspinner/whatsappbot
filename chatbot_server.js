@@ -43,7 +43,8 @@ if (process.env.NODE_ENV === "development"){
 } else{
     app.use(authMiddleware);
     app.post(`/api/${endpoint}`, async (req,res)=>{
-            console.log(req.body.Body);
+            console.log(`received from ${ req.headers['x-real-ip']}:`,req.body.Body);
+        
             if (!req.body.Body){
                 res.status(400).send("invalid request.");
                 return;
