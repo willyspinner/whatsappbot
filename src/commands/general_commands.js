@@ -30,11 +30,17 @@ module.exports = async (arr_message)=>{
                 break;
             }
             case 'psgrep': {
-                const { stdout, stderr } = await execPipedCommand(
-                    ['ps','aux'],
-                    ['grep', arr_message[1]]
-                );
-                return `*Result*\n \`\`\`${stdout}\`\`\``;k
+                console.log("trying to psgrep");
+                try{
+                    const { stdout, stderr } = await execPipedCommand(
+                        ['ps','aux'],
+                        ['grep', arr_message[1]]
+                    );
+                    return `*Result*\n \`\`\`${stdout}\`\`\``;
+                }catch(e){
+                    console.log("ps grep caught here");
+                    return e;
+                }
             }
 
         }
