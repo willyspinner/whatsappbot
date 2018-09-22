@@ -5,10 +5,12 @@ const responseHandler= require('./src/handler');
 const twilio = require('twilio');
 const authMiddleware = require('./src/auth/auth');
 require('dotenv').config();
+let twilioclient;
 if (process.env.NODE_ENV !== "development"){
     if (!process.env.ACCOUNT_SID || !process.env.AUTH_TOKEN || !process.env.MY_PHONE_NUMBER|| !process.env.TWILIO_PHONE_NUMBER || ! process.env.ENDPOINT){
         throw new Error("ACCOUNTS_ID/AUTH_TOKEN/MY_PHONE_NUMBER/TWILIO_PHONE_NUMBER/ENDPOINT ENVIRONMENT VARIABLE NOT DEFINED.");
     }
+  twilioclient = new twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 }
 
 // constants
@@ -32,13 +34,14 @@ if (process.env.NODE_ENV === "development"){
            return;
        }
        let response;
+       console.log("body received : ",req.body.Body);
        try{
            response = await responseHandler(req.body.Body);
        }catch(e){
            console.log("500. error: ",e);
            res.status(500).send(e);
        }
-           res.status(200).send(response)
+       res.status(200).send(response);
    })
 } else{
     app.use(authMiddleware);
@@ -49,20 +52,26 @@ if (process.env.NODE_ENV === "development"){
                 return;
             }
             const response = await responseHandler(req.body.Body);
-            const twilioclient = new twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
             twilioclient.messages.create({
                 body: response,
                 to: `whatsapp:${process.env.MY_PHONE_NUMBER}`,  // Text this number
                 from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}` // From a valid Twilio number
             })
                 .then((message) => res.status(200).end())
-                .catch((e)=>console.error(e));
+                .catch((e)=>{
+                    console.error("TWILIO FAILED.");
+                    console.error(e);
+                    }
+                )
+            ;
+
+
     });
 }
 const shutDown = async (signal) => {
     console.log(`signal ${signal}`, `OK. Bye... 👋`);
     process.exit(0);
-}
+};
 process.on('SIGTERM', () => shutDown('SIGTERM'));
 process.on('SIGINT', () => shutDown('SIGINT'));
 
