@@ -8,7 +8,7 @@
  redisclient = redis.createClient(redisconnectionobject);
 
  redisclient.on('error',(err)=>{
-     console.log("redis error", JSON.stringify(err));
+     console.error("redis error", JSON.stringify(err));
      process.exit(1);
  })
  console.log("redisdb",`redis connection established @ ${redisconnectionobject.host}:${redisconnectionobject.port}`)
