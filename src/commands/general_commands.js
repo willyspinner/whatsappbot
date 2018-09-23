@@ -1,4 +1,5 @@
 const {execPipedCommand, execSimpleCommand}  = require('../shellutils');
+const os = require('os');
 module.exports = async (arr_message)=>{
     const length = arr_message.length;
     if(length === 0 )
@@ -13,6 +14,9 @@ module.exports = async (arr_message)=>{
     if (length === 2){
         switch(arr_message[0]){
             case "status": {
+                if ( os.type() !== "Linux"){
+                    return "Sorry! status command needs linux.";
+                }
                 const { stdout, stderr } = await execPipedCommand(
                     ['systemctl' ,'-n' , '0', '--no-pager', 'status' ,arr_message[1]],
                     [ 'head', '-n', '5']

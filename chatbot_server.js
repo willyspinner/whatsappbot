@@ -27,6 +27,11 @@ switch (ENVIRON){
         twilioclient = new twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
         break;
     default:
+        console.log(`This is development mode. To send messages, simply use the command: 
+            curl -X POST localhost:${port}/api/${process.env.ENDPOINT} -H 'X-Real-IP:127.0.0.1' -d Body="put your command here"
+            (along with any extra parameters used)
+            Responses from the chatbot that would have been sent to whatsapp in production mode will be outputted to the terminal here.
+        `)
         console.log("using mock twilio client.");
         twilioclient =  new mocktwilioclient();
 }
