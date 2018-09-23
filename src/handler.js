@@ -2,11 +2,12 @@ const script_command = require('./commands/script_commands');
 const general_command = require('./commands/general_commands');
 const cmds= {
     "w": "w command (uptime, users, load, etc.)",
-    "status SERVICE":"systemctl status the requested ```SERVICE```",
-    "ip local" : "show local enp3s0 ip",
-    "ip public": "show public ip (by whatismyip)",
-    "psgrep SERVICE": "```ps aux | grep SERVICE```",
-    "exec SCRIPT": "execute ```SCRIPT``` in exec_scripts directory."
+    "status SERVICE":"systemctl status the requested ```SERVICE```.",
+    "ip local" : "show local enp3s0 ip.",
+    "ip public": "show public ip (by whatismyip).",
+    "psgrep SERVICE": "```ps aux | grep SERVICE```.",
+    "exec TOKEN SCRIPT arg1 arg2 ...": "authenticate with 2FA ```TOKEN``` and execute ```SCRIPT``` with arguments $1=arg1, $2=arg2 in exec_scripts directory.",
+    "exec auth request": "Request for 2FA auth token."
 };
 const commands = Object.keys(cmds)
     .map(key=> `> \`\`\`${key}\`\`\` \n     ${cmds[key]}`)

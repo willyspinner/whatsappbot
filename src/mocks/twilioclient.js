@@ -1,10 +1,12 @@
 class mocktwilioclient {
-    messages= {
-        create: (createArgs)=>{
-            return new Promise((resolve,reject)=>{
-                console.log("MOCK TWILIO CLIENT: SENDING :", createArgs.body)
-                resolve();
-            });
+    constructor(){
+        this.messages= {
+                create:(createArgs)=>{
+                    return new Promise((resolve,reject)=>{
+                    console.log("Mock Twilio Client: would have sent to whatsapp:\n", createArgs.body)
+                    resolve();
+                    });
+                }
         }
     }
 }
