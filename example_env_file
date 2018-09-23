@@ -1,0 +1,10 @@
+# NOTE: This should be named .production.env for prod, or .development.env for devel.
+ACCOUNT_SID="your twilio account SID"
+MY_PHONE_NUMBER="your personal phone number"
+TWILIO_PHONE_NUMBER="your assigned twilio phone number"
+AUTH_TOKEN="your auth token received from twilio"
+ENDPOINT="Your secret API endpoint that you will expose for twilio."
+HASH_SECRET="Your hash secret. Put some unguessable random stuff here."
+REDIS_HOST="redis host"
+REDIS_PORT=6379
+TTL_2FA_MINS="your 2FA expiration TTL in minutes"
