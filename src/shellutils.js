@@ -1,7 +1,7 @@
 const { spawn } = require('child_process');
 const execSimpleCmdHelper = (cmd,argsArr) => {
     return new Promise((resolve,reject)=>{
-        const final_process = spawn(cmd,argsArr);
+        const final_process = spawn(cmd,argsArr,{uid: process.env.UID});
         let stdout = '';
         let stderr = '';
         final_process.stdout.on('data', (data) => {
@@ -36,7 +36,7 @@ module.exports = {
             ["grep","-i","word_here"]
          */
         return new Promise((resolve,reject)=>{
-            const spawns = cmds.map((cmd)=>spawn(cmd[0],cmd.slice(1)));
+            const spawns = cmds.map((cmd)=>spawn(cmd[0],cmd.slice(1)),{uid: process.env.UID});
             for ( let i = 0; i < cmds.length - 1; i++){
                 let process1 = spawns[i];
                 let process2= spawns[i+1];
