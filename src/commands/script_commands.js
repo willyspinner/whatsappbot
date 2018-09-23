@@ -4,7 +4,7 @@ exports a method that either returns a promise or undefined if command is not fo
 put exec_scripts in exec_scripts directory, located in root..
  */
 const fs = require('fs');
-const {execSimpleCommandArrArgs}  = require('../shellutils');
+const {execPipedCommand}  = require('../shellutils');
 
 const auth= require('../auth/auth');
 module.exports = async (arr_message) => {
@@ -25,7 +25,7 @@ module.exports = async (arr_message) => {
                 }catch(e){
                         return `script ${arr_message[3]} cannot be executed, or may not exist. Please check. code: ${e.code}, syscall: ${e.syscall}`;
                 }
-                    const {stderr,stdout} = await execSimpleCommandArrArgs(pathname, arr_message.slice(4));
+                    const {stderr,stdout} = await execPipedCommand([pathname, ...arr_message.slice(4)], ["head", "-n", 50]);
                     if (stderr !== ''){
                         return stdout+stderr;
                     }
@@ -36,7 +36,7 @@ module.exports = async (arr_message) => {
             }
         }else{
             /* default */
-            return "Error. Please issue appropriate commands.";
+            return "Script Error. Please issue appropriate commands.";
         }
     }
     return undefined;

@@ -3,13 +3,13 @@ class mocktwilioclient {
         this.messages= {
                 create:(createArgs)=>{
                     return new Promise((resolve,reject)=>{
-                    console.log(
-                    `Mock Twilio Client: would have sent to whatsapp:
+                        console.log(
+`Mock Twilio Client: would have sent to whatsapp:
 **********************************************************************
 ${createArgs.body}
 **********************************************************************
-                    `);
-                    resolve();
+                        `);
+                        resolve();
                     });
                 }
         }

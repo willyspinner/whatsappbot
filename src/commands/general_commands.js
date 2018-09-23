@@ -35,7 +35,7 @@ module.exports = async (arr_message)=>{
             }
             case 'psgrep': {
                 console.log("trying to psgrep");
-                try{
+                try {
                     const { stdout, stderr } = await execPipedCommand(
                         ['ps','aux'],
                         ['grep', arr_message[1]]
