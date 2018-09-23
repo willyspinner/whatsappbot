@@ -1,57 +1,42 @@
-/* dependencies */
+/* normal dependencies */
 const express = require('express');
-const twilio = require('twilio');
 const moment = require('moment');
 const bodyParser = require('body-parser')
 const cluster = require('cluster');
 
-
-console.log(process.env.NODE_ENV? `using environment: ${process.env.NODE_ENV}`: `defaulting to development environment.`);
+/* ENVIRONMENT SETTINGS. SET BY EVERY INSTANCE.*/
 const ENVIRON = process.env.NODE_ENV? process.env.NODE_ENV : 'development';
 require('dotenv').config({path: require('path').resolve(process.cwd(),`.${ENVIRON}.env`)});
-
 if (!process.env.HASH_SECRET || !process.env.ACCOUNT_SID || !process.env.AUTH_TOKEN || !process.env.MY_PHONE_NUMBER|| !process.env.TWILIO_PHONE_NUMBER || ! process.env.ENDPOINT){
     throw new Error("HASH_SECRET/ACCOUNT_SID/AUTH_TOKEN/MY_PHONE_NUMBER/TWILIO_PHONE_NUMBER/ENDPOINT ENVIRONMENT VARIABLE NOT DEFINED.");
 }
-/* files used*/
-const responseHandler= require('./src/handler');
-const {accountAuthMiddleware} = require('./src/auth/auth');
-const mocktwilioclient = require('./src/mocks/twilioclient');
-
- /* initialization */
-let twilioclient;
-const app = express();
-const port = process.env.CHATBOT_PORT || 4455;
-
-
-// constants
-const endpoint = process.env.ENDPOINT;
-
 const numCPU = process.env.NUM_CPU || 1;
-// body parser
+const port = process.env.CHATBOT_PORT || 4455;
 if (cluster.isMaster){
-    console.log("")
-    for (let i = 0; i < numCPU; i++) {
-        cluster.fork();
-    }
-}else {
-    require('log-timestamp')(function () {
-        return `[CHATBOT_SERVER][${process.pid}]|${moment().format('DMMMYY HH:mm:ss')}| %s`
-    });
-    switch (ENVIRON){
-        case 'production':
-            console.log("using REAL twilio client. ");
-            twilioclient = new twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
-            break;
-        default:
-            console.log(`This is development mode. To send messages, simply use the command: 
+    if (ENVIRON !== "production" ){
+        console.log(`This is development/test mode. To send messages, simply use the command: 
             curl -X POST localhost:${port}/api/${process.env.ENDPOINT} -H 'X-Real-IP:127.0.0.1' -d Body="put your command here"
             (along with any extra parameters used)
             Responses from the chatbot that would have been sent to whatsapp in production mode will be outputted to the terminal here.
         `);
-            console.log("using mock twilio client.");
-            twilioclient =  new mocktwilioclient();
     }
+    for (let i = 0; i < numCPU; i++) {
+        cluster.fork();
+    }
+}else {
+    require('log-timestamp')(() => `[CHATBOT_SERVER][${process.pid}]|${moment().format('DMMMYY HH:mm:ss')}| %s`);
+    console.log(process.env.NODE_ENV? `using environment: ${process.env.NODE_ENV}`: `defaulting to development environment.`);
+    /* files used*/
+    const responseHandler= require('./src/handler');
+    const {accountAuthMiddleware} = require('./src/auth/auth');
+
+    /* initialization */
+    const app = express();
+
+// constants
+    const endpoint = process.env.ENDPOINT;
+
+    const twilioclient = require('./src/twilio');
     app.use(bodyParser.json());       // to support JSON-encoded bodies
     app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
         extended: true
