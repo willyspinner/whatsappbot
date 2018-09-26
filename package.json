@@ -4,7 +4,7 @@
   "description": "",
   "main": "chatbot_server.js",
   "scripts": {
-    "serve": "node chatbot_server.js",
+    "devel-server": "node chatbot_server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

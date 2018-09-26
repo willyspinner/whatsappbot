@@ -7,12 +7,14 @@ const cluster = require('cluster');
 /* ENVIRONMENT SETTINGS. SET BY EVERY INSTANCE.*/
 const ENVIRON = process.env.NODE_ENV? process.env.NODE_ENV : 'development';
 const configReadResult = require('dotenv').config({path: require('path').resolve(process.cwd(),`.${ENVIRON}.env`)});
+const {allEnvironmentVariablesDefined, throwEnvVarsUndefinedError}=  require('./src/utils');
 if (configReadResult.error){
     throw new Error(`ERROR reading config.${configReadResult.error}`);
 }
 /* Check if all necessary environ vars are defined.*/
-if (!process.env.HASH_SECRET || !process.env.ACCOUNT_SID || !process.env.AUTH_TOKEN || !process.env.MY_PHONE_NUMBER|| !process.env.TWILIO_PHONE_NUMBER || ! process.env.ENDPOINT){
-    throw new Error("HASH_SECRET/ACCOUNT_SID/AUTH_TOKEN/MY_PHONE_NUMBER/TWILIO_PHONE_NUMBER/ENDPOINT ENVIRONMENT VARIABLE NOT DEFINED.");
+if (!allEnvironmentVariablesDefined()){
+    throwEnvVarsUndefinedError();
+
 }
 /* needed info for master */
 const numCPU = process.env.NUM_CPU || 1;
@@ -21,12 +23,12 @@ if (cluster.isMaster){
     require('log-timestamp')(() => `[CHATBOT_SERVER][MASTER @ ${process.pid}]|${moment().format('DMMMYY HH:m:ss')}| %s`);
     if (ENVIRON !== "production" ){
         console.log(`\n=> This is development/test mode. To send messages, simply use the command: 
-            curl -X POST localhost:${port}/api/${process.env.ENDPOINT} -H 'X-Real-IP:127.0.0.1' -d Body="put your command here"
+            curl -X POST localhost:${port}/api/${process.env.ENDPOINT} -H 'X-Real-IP:127.0.0.1' -d AccountSid=${process.env.ACCOUNT_SID} -d Body="put your command here"
             (along with any extra parameters used)
             Responses from the chatbot that would have been sent to whatsapp in production mode will be outputted to the terminal here.
         `);
     }else {
-        console.log(`\n=> This is Production Mode. Use Your whatsapp on your phone to talk to this bot.`);
+        console.log(`\n=> This is Production Mode. Use whatsapp on your phone to talk to this bot.`);
     }
     for (let i = 0; i < numCPU; i++) {
         cluster.fork();
@@ -41,8 +43,6 @@ if (cluster.isMaster){
     /* initialization */
     const app = express();
 
-    // constants
-    const endpoint = process.env.ENDPOINT;
 
     // twilioclient
     const twilioclient = require('./src/twilio');
@@ -52,7 +52,7 @@ if (cluster.isMaster){
     }));
 
     app.use(accountAuthMiddleware);
-    app.post(`/api/${endpoint}`, async (req, res) => {
+    app.post(`/api/${process.env.ENDPOINT}`, async (req, res) => {
         console.log(`received from ${ req.headers['x-real-ip']}:`, req.body.Body);
 
         if (!req.body.Body) {
