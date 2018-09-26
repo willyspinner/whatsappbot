@@ -59,18 +59,7 @@ if (cluster.isMaster){
             res.status(400).send("invalid request.");
             return;
         }
-        const response = await responseHandler(req.body.Body);
-        twilioclient.messages.create({
-            body: response,
-            to: `whatsapp:${process.env.MY_PHONE_NUMBER}`,  // Text this number
-            from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}` // From a valid Twilio number
-        })
-            .then((message) => res.status(200).end())
-            .catch((e) => {
-                    console.error("TWILIO FAILED.");
-                    console.error(e);
-                }
-            );
+        await responseHandler(req.body.Body,req,res);
 
     });
     const server = app.listen(port);

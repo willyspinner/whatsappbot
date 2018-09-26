@@ -1,5 +1,6 @@
 const script_command = require('./commands/script_commands');
 const general_command = require('./commands/general_commands');
+const twilioclient= require('./twilio')
 const cmds= {
     "w": "w command (uptime, users, load, etc.)",
     "status SERVICE":"systemctl status the requested ```SERVICE```.",
@@ -19,16 +20,39 @@ Hi! I'm Bearbot, a bot for the Jusuf Ubuntu Servers.
 ${commands}
 `;
 
-module.exports = async (message_text)=>{
+module.exports = async (message_text,req,res)=>{
 /* message_text. Returns a message string.*/
+    /*TODO: REFACTOR THIS METHOD. Because sometimes we don't want a be all end all (req res) kind of structure,
+    sometimes the bot should send a message confirming that some build (that may take some time) is starting.
+
+    So the methods themselves (script_command, general_command) can themselves call the twilio send commands.
+    The methods should return falsy if further interpretation by other commands is required, or true if ithe response fully matches user action.
+
+     */
     const arr_message = message_text.toLowerCase().split(" ");
-    const script_cmd_response = await script_command(arr_message);
-    if (script_cmd_response) {
-        return script_cmd_response;
+    const script_cmd_end_target = await script_command(arr_message);
+    if (script_cmd_end_target) {
+        res.json({status:200, message: "script cmd ok."});
+        return true;
     }
-    const general_cmd_response = await general_command(arr_message);
-    if (general_cmd_response) {
-        return general_cmd_response;
+    const general_command_end_target = await general_command(arr_message);
+    if (general_command_end_target) {
+       res.json({status:200, message: "general cmd ok."});
+        return true;
     }
-    return intro_string;
+    //return intro_string;
+    /* send intro string here, then return false. */
+
+    let okFlag = true;
+    let message= "default help info ok.";
+    await twilioclient.requestTwilioSendToWhatsapp(intro_string)
+        .catch((e) => {
+                console.error("TWILIO FAILED.");
+                console.error(e);
+                okFlag= false;
+            message= "failed to push to twilio.";
+            }
+        );
+    res.json({status:okFlag? 200:500, message});
+    return true;
 }

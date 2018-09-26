@@ -12,4 +12,9 @@ switch (ENVIRON){
         console.log("using mock twilio client.");
         twilioclient =  new mocktwilioclient();
 }
-module.exports = twilioclient;/* twilio instance here */;
+//module.exports = twilioclient;/* twilio instance here */;
+module.exports.requestTwilioSendToWhatsapp = (response)=>{return twilioclient.messages.create({
+        body: response,
+        to: `whatsapp:${process.env.MY_PHONE_NUMBER}`,  // Text this number
+        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}` // From a valid Twilio number
+    })};
