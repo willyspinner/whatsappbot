@@ -1,3 +1,6 @@
+// NOTE: differentiate between production and non-production environments using NODE_ENV.
+// NODE_ENV === 'production' ?
+
 // Please implement the following methods:
 
 /* Expressjs middleware to authenticate twilio.*/
