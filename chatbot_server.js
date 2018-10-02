@@ -44,8 +44,6 @@ if (cluster.isMaster){
     const app = express();
 
 
-    // twilioclient
-    const twilioclient = require('./src/twilio');
     app.use(bodyParser.json());       // to support JSON-encoded bodies
     app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
         extended: true

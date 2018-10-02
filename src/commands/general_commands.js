@@ -1,6 +1,10 @@
+/*
+General commands only have one request one response.
+They aren't like scripts, which have a confirmation, AND a done 'message'
+(two message reply).
+ */
 const {execPipedCommand, execSimpleCommand}  = require('../shellutils');
 const os = require('os');
-const twilioclient = require('../twilio');
 module.exports = async (arr_message)=>{
     const length = arr_message.length;
     if(length === 0 )
@@ -9,29 +13,20 @@ module.exports = async (arr_message)=>{
         switch(arr_message[0]){
             case "w":
                 const { stdout, stderr } = await execSimpleCommand('w');
-                await twilioclient.requestTwilioSendToWhatsapp(
-                    `*Result*\n \`\`\`${stdout}\`\`\``
-                );
-                return true;
+                return `*Result*\n \`\`\`${stdout}. \`\`\``
         }
     }
     if (length === 2){
         switch(arr_message[0]){
             case "status": {
                 if ( os.type() !== "Linux"){
-                    await twilioclient.requestTwilioSendToWhatsapp(
-                    "Sorry! status command needs linux."
-                );
-                    return true;
+                    return "Sorry! status command needs linux.";
                 }
                 const { stdout, stderr } = await execPipedCommand(
                     ['systemctl' ,'-n' , '0', '--no-pager', 'status' ,arr_message[1]],
                     [ 'head', '-n', '5']
                 );
-                await twilioclient.requestTwilioSendToWhatsapp(
-                    `*Result*\n \`\`\`${stdout}\`\`\``
-                );
-                return true;
+                return `*Result*\n \`\`\`${stdout}\`\`\``;
             }
             case 'ip': {
                 let result = '';
@@ -44,10 +39,7 @@ module.exports = async (arr_message)=>{
                 } else{
                     result = "*INCORRECT ip syntax.* chat 'help' for more instructions.";
                 }
-                await twilioclient.requestTwilioSendToWhatsapp(
-                    result
-                );
-                return true;
+                return result;
             }
             case 'psgrep': {
                 try {
@@ -55,15 +47,9 @@ module.exports = async (arr_message)=>{
                         ['ps','aux'],
                         ['grep', arr_message[1]]
                     );
-                    await twilioclient.requestTwilioSendToWhatsapp(
-                        `*Result*\n \`\`\`${stdout}\`\`\``
-                    );
-                    return true;
+                        return `*Result*\n \`\`\`${stdout}\`\`\``;
                 }catch(e){
-                    await twilioclient.requestTwilioSendToWhatsapp(
-                        `*PSGREP ERROR. Result*\n ${e}`
-                    );
-                    return true;
+                    return `*PSGREP ERROR. Result*\n ${e}`;
                 }
             }
 

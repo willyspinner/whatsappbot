@@ -1,7 +1,11 @@
 /*
 exec general purpose exec_scripts.
-exports a method that either returns a promise or undefined if command is not found.
+exports a method that either returns the initial reply string
+(confirmation that job is in progress) or undefined if command is not found.
 put exec_scripts in exec_scripts directory, located in root..
+
+Here, an initial reply is sent by returning, and additional messages (e.g. when job is done)
+is sent when promises inside here resolve.
  */
 const fs = require('fs');
 const twilioclient = require('../twilio');
@@ -13,8 +17,7 @@ module.exports = async (arr_message) => {
         if (arr_message.length === 3 && arr_message[2] === "request"){
             const token = await auth.generateAndStore2faToken();
             await auth.send2faToken(token);
-            await twilioclient.requestTwilioSendToWhatsapp("2FA token generation successful. Please See your 2FA device.");
-            return true;
+            return "2FA token generation successful. Please See your 2FA device.";
         } else if (arr_message.length >= 4){
             /* authenticate. */
             const authResult = await auth.authenticate2faToken(arr_message[2]);
@@ -24,34 +27,27 @@ module.exports = async (arr_message) => {
                 try{
                     fs.accessSync(pathname, fs.constants.X_OK );
                 }catch(e){
-                    await twilioclient.requestTwilioSendToWhatsapp(
-                        `script ${arr_message[3]} cannot be executed, or may not exist. Please check. code: ${e.code}, syscall: ${e.syscall}`
-                    );
-                    return true;
+                    return `script ${arr_message[3]} cannot be executed, or may not exist. Please check. code: ${e.code}, syscall: ${e.syscall}`
                 }
                 let args = arr_message.slice(4);
-                
-                await twilioclient.requestTwilioSendToWhatsapp(
-                    ` executing script: ${arr_message[3]} ${typeof args === "undefined"? '':args.join(" ")} .... Please wait...`
-                )
-                const {stderr,stdout} = await execPipedCommand([pathname, ...arr_message.slice(4)], ["head", "-n", 50]);
-                if (stderr !== ''){
-                    await twilioclient.requestTwilioSendToWhatsapp(
-                        stdout+stderr);
-                    return true;
-                }
-                await twilioclient.requestTwilioSendToWhatsapp(stdout)
-                return true;
+
+                execPipedCommand([pathname, ...arr_message.slice(4)], ["head", "-n", 50]).then(async(resultObj)=>{
+                    let {stdout,stderr} = resultObj;
+                    if (stderr !== ''){
+                        await twilioclient.requestTwilioSendToWhatsapp(
+                            stdout+stderr);
+                    }else{
+                        await twilioclient.requestTwilioSendToWhatsapp(stdout)
+                    }
+                });
+                return `2FA Authenticated. Executing script: ${arr_message[3]} ${typeof args === "undefined"? '':args.join(" ")} .... Please wait...`;
             }else{
                 /* Not authenticated. */
-                await twilioclient.requestTwilioSendToWhatsapp(
-                `Script authentication error. Reason : ${authResult.reason}`);
-                return true;
+                return `Script authentication error. Reason : ${authResult.reason}`;
             }
         }else{
             /* default */
-            await twilioclient.requestTwilioSendToWhatsapp("Script Error. Please issue appropriate commands.");
-            return true;
+            return "Script Error. Please issue appropriate commands.";
         }
     }
     return undefined;
