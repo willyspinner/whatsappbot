@@ -5,7 +5,7 @@
   "main": "chatbot_server.js",
   "scripts": {
     "devel-server": "node chatbot_server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test-auth": "NODE_ENV=development mocha --exit validator/*.test.js"
   },
   "author": "",
   "license": "ISC",
@@ -18,5 +18,9 @@
     "moment": "^2.22.2",
     "redis": "^2.8.0",
     "twilio": "^3.19.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
   }
 }
