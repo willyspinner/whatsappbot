@@ -17,7 +17,7 @@ if (!allEnvironmentVariablesDefined()){
 
 }
 /* needed info for master */
-const numCPU = process.env.NUM_CPU || 1;
+const numCPU = process.env.NUM_CPU || require('os').cpus().length;
 const port = process.env.CHATBOT_PORT || 4455;
 if (cluster.isMaster){
     require('log-timestamp')(() => `[CHATBOT_SERVER][MASTER @ ${process.pid}]|${moment().format('DMMMYY HH:m:ss')}| %s`);
