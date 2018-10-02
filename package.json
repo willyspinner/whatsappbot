@@ -6,6 +6,7 @@
   "scripts": {
     "devel-server": "NUM_CPU=1 node chatbot_server.js",
     "prod-server": "NODE_ENV=production node chatbot_server.js",
+    "prod-server-daemon": "NODE_ENV=production forever start chatbot_server.js",
     "test-auth": "NODE_ENV=development mocha --exit validator/*.test.js"
   },
   "author": "",
