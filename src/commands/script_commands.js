@@ -16,9 +16,13 @@ module.exports = async (arr_message) => {
     if (arr_message[0] === "exec" && arr_message[1] === "auth"){
         if (arr_message.length === 3 && arr_message[2] === "request"){
             const token = await auth.generateAndStore2faToken();
-            await auth.send2faToken(token);
-            return "2FA token generation successful. Please See your 2FA device.";
-        } else if (arr_message.length >= 4){
+            try{
+                await auth.send2faToken(token);
+                return "2FA token generation successful. Please See your 2FA device.";
+            }catch(e){
+                return "2FA token sending failed. Please try again";
+            }
+        } else if (arr_message.length >= 4) {
             /* authenticate. */
             const authResult = await auth.authenticate2faToken(arr_message[2]);
             if (authResult.isAuthenticated){

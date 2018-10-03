@@ -13,9 +13,9 @@ module.exports.accountAuthMiddleware= (req,res,next) =>{};
 module.exports.generateAndStore2faToken = async () => { return "sample token";};
 
 
-/* Send 2fa token to your 2fa device */
+/* Send 2fa token to your 2fa device. Returns a promise.*/
 
-module.exports.send2faToken = (token) => {
+module.exports.send2faToken = async(token) => {
     console.log("use token: ",token, "to authorize.");
 };
 
