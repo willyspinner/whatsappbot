@@ -3,10 +3,6 @@
 
 // Please implement the following methods:
 
-/* Expressjs middleware to authenticate twilio.*/
-
-module.exports.accountAuthMiddleware= (req,res,next) =>{};
-
 
 /* generate and store 2fa token safely. Returns the token that we will send to the user */
 

@@ -6,7 +6,7 @@ let twilioclient;
 switch (ENVIRON){
     case 'production':
         console.log("using REAL twilio client. ");
-        twilioclient = new twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+        twilioclient = new twilio(process.env.ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
         break;
     default:
         console.log("using mock twilio client.");

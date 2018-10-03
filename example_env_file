@@ -2,7 +2,7 @@
 ACCOUNT_SID="your twilio account SID"
 MY_PHONE_NUMBER="your personal phone number"
 TWILIO_PHONE_NUMBER="your assigned twilio phone number"
-AUTH_TOKEN="your auth token received from twilio"
+TWILIO_AUTH_TOKEN="your auth token received from twilio"
 ENDPOINT="Your secret API endpoint that you will expose for twilio."
 HASH_SECRET="Your hash secret. Put some unguessable random stuff here."
 REDIS_HOST="redis host"

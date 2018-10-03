@@ -3,6 +3,7 @@ const express = require('express');
 const moment = require('moment');
 const bodyParser = require('body-parser')
 const cluster = require('cluster');
+const twilio = require('twilio');
 
 /* ENVIRONMENT SETTINGS. SET BY EVERY INSTANCE.*/
 const ENVIRON = process.env.NODE_ENV? process.env.NODE_ENV : 'development';
@@ -50,16 +51,26 @@ if (cluster.isMaster){
     }));
 
     app.use(accountAuthMiddleware);
-    app.post(`/api/${process.env.ENDPOINT}`, async (req, res) => {
-        console.log(`received from ${ req.headers['x-real-ip']}:`, req.body.Body);
+    if(process.env.NODE_ENV === "production"){
+            app.post(`/api/${process.env.ENDPOINT}`, twilio.webhook(), async (req, res) => {
+            console.log(`received from ${ req.headers['x-real-ip']}:`, req.body.Body);
+            if (!req.body.Body) {
+                res.status(400).send("invalid request.");
+                return;
+            }
+            await responseHandler(req.body.Body,req,res);
+        });
+    }else{
+        app.post(`/api/${process.env.ENDPOINT}`, async (req, res) => {
+            console.log(`received from ${ req.headers['x-real-ip']}:`, req.body.Body);
+            if (!req.body.Body) {
+                res.status(400).send("invalid request.");
+                return;
+            }
+            await responseHandler(req.body.Body,req,res);
+        });
 
-        if (!req.body.Body) {
-            res.status(400).send("invalid request.");
-            return;
-        }
-        await responseHandler(req.body.Body,req,res);
-
-    });
+    }
     const server = app.listen(port);
     const shutDown = async (signal) => {
         console.log(`signal ${signal}`, `OK. Bye... 👋`);

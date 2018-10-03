@@ -1,6 +1,5 @@
 const script_command = require('./commands/script_commands');
 const general_command = require('./commands/general_commands');
-const twilioclient= require('./twilio')
 const cmds= {
     "w": "w command (uptime, users, load, etc.)",
     "status SERVICE":"systemctl status the requested ```SERVICE```.",
