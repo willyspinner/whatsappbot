@@ -2,7 +2,7 @@
 I maintain an ubuntu home server, and made a Whatsapp Chatbot for it just for fun.
 
 It makes life easier! My server and me are 10000 miles away (Jakarta, Indonesia vs. Los Angeles, CA).
-Having to SSH/teleport all the time is a pain, so this is why I developed this.
+Having to SSH/teleport all the time is a pain.
 
 
 
